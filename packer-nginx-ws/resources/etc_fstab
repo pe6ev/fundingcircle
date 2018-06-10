@@ -1,0 +1,2 @@
+#CIS Hardening - Security options for /dev/shm
+shmfs /dev/shm tmpfs defaults,nodev,noexec,nosuid 0 0

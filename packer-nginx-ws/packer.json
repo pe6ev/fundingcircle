@@ -1,0 +1,75 @@
+{
+  "variables": {
+    "base_region": "us-east-1",
+    "ami_name": "FundingCircle-Web"
+  },
+
+  "builders": [
+    {
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "name": "{{user `ami_name`}}",
+      "type": "amazon-ebs",
+      "region": "{{user `base_region`}}",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "*Red Hat Enterprise Linux 7.5*",
+          "root-device-type": "ebs"
+        },
+        "most_recent": true
+      },
+      "instance_type": "t2.micro",
+      "communicator": "ssh",
+      "ssh_pty": true,
+      "ssh_username": "centos",
+      "ssh_timeout": "5m",
+      "associate_public_ip_address": true,
+      "ami_description": "Web Server Nginx Host based on RedHat 7 image",
+      "ami_name": "{{user `ami_name`}}_{{isotime | clean_ami_name}}",
+      "tags": {
+        "Name": "FundingCircle-WebServer",
+        "Provisioner": "Packer FundingCircle AMI"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "resources/etc_modprobe.d_CIS.conf",
+      "destination": "/tmp/etc_modprobe.d_CIS.conf"
+    },
+    {
+      "type": "file",
+      "source": "resources/etc_sysctl.conf",
+      "destination": "/tmp/etc_sysctl.conf"
+    },
+    {
+      "type": "file",
+      "source": "resources/etc_security_limits.conf",
+      "destination": "/tmp/etc_security_limits.conf"
+    },
+    {
+      "type": "file",
+      "source": "resources/nginx.conf",
+      "destination": "/tmp/nginx.conf"
+    },
+    {
+      "type": "file",
+      "source": "resources/etc_fstab",
+      "destination": "/tmp/etc_fstab"
+    },
+    {
+      "type": "file",
+      "source": "resources/index.html",
+      "destination": "/tmp/index.html"
+    },
+    {
+      "type": "shell",
+      "execute_command": "sudo -S bash '{{.Path}}'",
+      "scripts": [
+        "scripts/nginx_install.sh"
+      ]
+    }
+  ]
+}
