@@ -338,7 +338,7 @@ resource "aws_instance" "Web" {
     App         = "Nginx"
     ManagedBy   = "PetarPeshev"
     Environment = "${var.environment}"
-    Role        = "Service Web Server"
+    Role        = "ServiceWebServer"
     Provisioner = "Terraform"
   }
 }
@@ -356,7 +356,7 @@ resource "aws_instance" "Web2" {
     App         = "Nginx"
     ManagedBy   = "PetarPeshev"
     Environment = "${var.environment}"
-    Role        = "Service Web Server"
+    Role        = "ServiceWebServer"
     Provisioner = "Terraform"
   }
 }
@@ -378,24 +378,12 @@ resource "aws_instance" "DB" {
   }
 }
 
-//Create alb s3 bucket
-
-resource "aws_s3_bucket" "AlbLogBucket" {
-  bucket = "alb-global-log-fund"
-  acl    = "public-read"
-}
-
 //Create Application Load Balancer
 
 resource "aws_alb" "main" {
   name            = "ExternalALB"
   subnets         = ["${aws_subnet.public.*.id}"]
   security_groups = ["${aws_security_group.AlbSG.id}"]
-
-  access_logs {
-    bucket  = "alb-global-log-fund"
-    enabled = "true"
-  }
 
   depends_on = ["aws_alb_target_group.main"]
 
@@ -439,7 +427,7 @@ resource "aws_alb_target_group" "main" {
 
   tags {
     Name        = "ExternalALB"
-    App         = "Service ALB"
+    App         = "SericeALB"
     ManagedBy   = "PetarPeshev"
     Environment = "${var.environment}"
     Role        = "Service ALB target group"
